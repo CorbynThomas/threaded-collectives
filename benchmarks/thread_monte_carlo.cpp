@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         //each rank gather to its own main thread then add each rank together.
         for(int i = 0; i < num_tasks; i++)
         {
-            thread_gather(sendBuffer, 1, MPI_LONG_LONG, recBuffer, 1, MPI_LONG_LONG, i, i, MPI_COMM_WORLD);
+            thread_gather(sendBuffer, 1, MPI_LONG_LONG, recBuffer, 1, MPI_LONG_LONG, i, MPI_COMM_WORLD);
         }
 
         for(int i = 0; i < num_tasks; i++)
