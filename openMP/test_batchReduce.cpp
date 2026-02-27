@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
     int num_threads = 0;
 
-    #pragma omp parallel num_threads(3)
+    #pragma omp parallel
     {
         #pragma omp single
             num_threads = omp_get_num_threads();
@@ -56,8 +56,16 @@ int main(int argc, char** argv)
             recbuf.resize(sendcount, -12);
         }
 
-        double time1, time2, time3, timeTotal;
-        for(int i = 0; i < 5; i++)
+        //warmup run
+        best_barrier();
+        int rc = batch_reduce(buf.data(), recbuf.data(), sendcount, MPI_INT, MPI_SUM, MASTER, MPI_COMM_WORLD);
+        assert(rc == MPI_SUCCESS);
+        best_barrier();
+        
+
+        double time1, time2, time3;
+        double timeTotal = 0;
+        for(int i = 0; i < 75; i++)
         {
             time1 = MPI_Wtime(); //getting the first time
             best_barrier();
@@ -80,7 +88,7 @@ int main(int argc, char** argv)
 
         if(rank == MASTER && tid == 0)
         {
-            cout << "\nThe time the program took to run on average over 5 runs was " << timeTotal/size << " seconds with " << sendcount << " sends and " << num_threads << " threads" << endl;
+            cout << "\nThe time the program took to run on average over 75 runs was " << timeTotal/(size * 75) << " seconds with " << sendcount << " sends, " << num_threads << " threads and " << size << " processes" << endl;
         }
     }
 
